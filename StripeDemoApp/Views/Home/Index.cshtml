@@ -1,0 +1,85 @@
+﻿@model List<StripeDemoApp.Models.EventDemo>
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-8 text-center">
+        <h2>Getting started</h2>
+        <table class="table table-lg table-striped table-hover border-bottom">
+            <thead>
+                <tr>
+                    <th class="d-none d-lg-table-cell">Created Date</th>
+                    <th>Event Name</th>
+                    <th>Has Payment</th>
+                    <th class="d-none d-md-table-cell">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="d-none d-lg-table-cell">@item.CreatedDate.ToString("yyyy-MM-dd")</td>
+                        <td>@item.EventName</td>
+                        <td>@(item.HasPayment ? "Yes" : "No")</td>
+                        <td class="d-none d-md-table-cell">@item.Price.ToString("C")</td>
+                        @if (item.HasPayment)
+                        {
+                            @*<td><a href="/Checkout/CheckoutOrder?eventId=@item.ID" class="btn btn-primary">Pay Now</a></td>*@
+                            <td><button onclick="OnSubscribe(@item.ID)" class="btn btn-primary">Pay Now</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+
+</div>
+
+@section scripts
+{
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        function OnSubscribe(eventId) {
+            // /Checkout/CheckoutOrder?eventId=
+            let selectedEventId = eventId;
+            $.ajax({
+                type: "POST",
+                url: "/Checkout/CheckoutOrder?eventId=" + selectedEventId,
+                //data: JSON.stringify(employee),
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != null) {
+                        console.log("checkout response: " + response);
+                        let sessionId = response.SessionId;
+                        let pubKey = response.PubKey;
+                        checkout(pubKey, sessionId);
+                    } else {
+                        alert("Something went wrong");
+                    }
+                },
+                failure: function (response) {
+                    alert(response.responseText);
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+
+        }
+
+        function checkout(pubKey, sessionId) {
+            const stripe = Stripe(pubKey);
+            stripe.redirectToCheckout({ sessionId });
+        }
+    </script>
+
+}

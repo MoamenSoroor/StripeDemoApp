@@ -1,0 +1,71 @@
+﻿@model StripeDemoApp.Models.UserInfoCheckoutModel
+
+@{
+    ViewBag.Title = "Checkout Success";
+}
+
+<h2>Checkout Success</h2>
+
+<div>
+    <h4>Checkout Info</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Username)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Username)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CheckoutEmail)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CheckoutEmail)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PaidAmount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PaidAmount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ReservedEventId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ReservedEventId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EventName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EventName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EventDescription)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EventDescription)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to Events", "Index","Home")
+</p>
