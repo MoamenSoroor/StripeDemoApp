@@ -25,23 +25,7 @@ namespace StripeDemoApp.Data
     {
         protected override void Seed(AppDataContext context)
         {
-            //var stripePay1 = new StripUserPaymentInfo()
-            //{
-            //    Id = 1,
-            //    PublicKey = "pk_test_51NrBSvJIhi7Tsh1qCE23s8BlErKrKuQ5ryxuBWb4pg9fxMdI2wk793PF2nbZ7z02CKlolnWAiuXfVOW4epgDbouz00BiYA9gCF",
-            //    SecretKey = "sk_test_51NrBSvJIhi7Tsh1qMbm6qItfYSLEJVPk9EY7jb0pwsmrOHX0WKN9739TcjNKFvAqNNo0GHyDbwiHNtgMIrBwJoa1002hC2EIcM",
-            //    ,AccountId = "acct_1NrBSvJIhi7Tsh1q"
-            //};
-
-            //var stripePay2 = new StripUserPaymentInfo()
-            //{
-            //    Id = 2,
-            //    PublicKey = "pk_test_51NtTmKF2NqG2MwCbKmavZ1PKnSVUFTiZjqvDGi4PHqd38ZxhweYRzl3WYRxL5O4Cw8DPeSkqDJ2HHpTPWp6G6yTO00XclsLC28",
-            //    SecretKey = "sk_test_51NtTmKF2NqG2MwCbZ61OSe6FzRdxrdtQSAYWK9XNCTPE2U2Gz8zxrL6SEHXWDnq3t6uhUMXUJCPJs917A0mun3w900DjFwo9Yv",
-            //    ,AccountId = "acct_1NtTmKF2NqG2MwCb" // moamen
-            //};
-
-            //context.StripePaymentInfo.AddRange(new[] { stripePay1, stripePay2 });
+            
 
 
             var tenants = new List<TenantInfo>(){
@@ -51,7 +35,7 @@ namespace StripeDemoApp.Data
                     Id = 1,
                     TenantName = "First Tenant Payment",
                     //StripePaymentInfoId = 1,
-                    AccountId = "acct_1NrBSvJIhi7Tsh1q"
+                    AccountId = ""
                 },
                     new TenantInfo()
                 {
@@ -59,7 +43,7 @@ namespace StripeDemoApp.Data
                     Id = 2,
                     TenantName = "Second Tenant Payment (moamen)",
                     //StripePaymentInfoId = 2,
-                    AccountId = "acct_1NtTmKF2NqG2MwCb"
+                    AccountId = ""
 
                 }
             };
