@@ -7,123 +7,179 @@ using System.Web;
 using System.Web.Mvc;
 using Stripe.Checkout;
 using StripeDemoApp.Services;
+using Stripe;
+using StripeDemoApp.Data;
 
 namespace StripeDemoApp.Controllers
 {
 
     public class CheckoutController : Controller
     {
-        UsersService usersService = new UsersService();
-        EventService eventService = new EventService();
+        private readonly TenantService tenantInfoService;
+        private readonly AppEventsService eventService;
 
-        [HttpPost]
+        public CheckoutController(TenantService tenantInfoService,AppEventsService eventService)
+        {
+            this.tenantInfoService = tenantInfoService;
+            this.eventService = eventService;
+        }
+
+        //[HttpPost]
+        //public async Task<ActionResult> CheckoutOrder(int eventId)
+        //{
+        //    var stripOp = Configurations.GetStripeConfig();
+
+        //    var eventDemo = eventService.GetEvent(eventId);
+        //    var tenant = eventDemo.TenantInfo;
+
+        //    string thisApiUrl = GetCurrentApiBaseUrl();
+
+
+        //    if (string.IsNullOrWhiteSpace(thisApiUrl) == false)
+        //    {
+        //        var sessionId = await CheckOut(eventDemo, tenant, thisApiUrl);
+        //        var checkoutOrderResponse = new CheckoutOrderResponse()
+        //        {
+        //            SessionId = sessionId,
+        //            PubKey = stripOp.PubKey,
+        //            //AccountId = tenant.AccountId,
+        //        };
+
+        //        return Json(checkoutOrderResponse);
+        //    }
+        //    else
+        //    {
+        //        return Json(new { Error = "error" });
+        //    }
+        //}
+
         public async Task<ActionResult> CheckoutOrder(int eventId)
         {
+            var stripOp = Configurations.GetStripeConfig();
+
             var eventDemo = eventService.GetEvent(eventId);
-            string thisApiUrl = 
-                string.Format("{0}://{1}{2}", 
-                Request.Url.Scheme, 
-                Request.Url.Authority, 
-                Url.Content("~"));
 
-            if (string.IsNullOrWhiteSpace(thisApiUrl) == false)
-            {
-                var sessionId = await CheckOut(eventDemo, thisApiUrl);
-                StripeOptions  stripeOp= Configurations.GetStripeConfig();
-                var pubKey = stripeOp.PubKey;
+            var tenant = tenantInfoService.GetTenantInfo(3);
 
-                var checkoutOrderResponse = new CheckoutOrderResponse()
-                {
-                    SessionId = sessionId,
-                    PubKey = pubKey
-                };
+            string thisApiUrl = GetCurrentApiBaseUrl();
 
-                return Json(checkoutOrderResponse);
-            }
-            else
-            {
-                return Json(new { Error="error" });
-            }
+
+            var session = await CheckOut(eventDemo, tenant, thisApiUrl);
+
+            return Redirect(session.Url);
+
         }
 
 
-        private async Task<string> CheckOut(EventDemo eventDemo, string thisApiUrl)
+        private string GetCurrentApiBaseUrl()
         {
-            // Create a payment flow from the items in the cart.
-            // Gets sent to Stripe API.
+            return string.Format("{0}://{1}{2}",
+                            Request.Url.Scheme,
+                            Request.Url.Authority,
+                            Url.Content("~"));
+        }
+
+        private async Task<Session> CheckOut(AppEvent eventDemo,TenantInfo tenantInfo, string thisApiUrl)
+        {
+            //var stripOp = Configurations.GetStripeConfig();
+
+
+            //var requestOptions = new RequestOptions();
+            ////requestOptions.ApiKey = tenantInfo.StripePaymentInfo.SecretKey;
+            //requestOptions.ApiKey = stripOp.ApiKey;
+            //requestOptions.StripeAccount = tenantInfo.AccountId; // my account id
+
+
             var options = new SessionCreateOptions
             {
                 // Stripe calls the URLs below when certain checkout events happen such as success and failure.
-                SuccessUrl = $"{thisApiUrl}/checkout/CheckoutSuccess?sessionId=" + "{CHECKOUT_SESSION_ID}", // Customer paid.
+                SuccessUrl = $"{thisApiUrl}/checkout/CheckoutSuccess?sessionId=" + "{CHECKOUT_SESSION_ID}&tenantID="+ tenantInfo.Id, // Customer paid.
                 CancelUrl = $"{thisApiUrl}/checkout/CheckoutFailed",  // Checkout cancelled.
                 PaymentMethodTypes = new List<string> // Only card available in test mode?
                 {
                     "card"
                 },
                 LineItems = new List<SessionLineItemOptions>
-            {
-                new SessionLineItemOptions ()
                 {
-                    PriceData = new SessionLineItemPriceDataOptions
+                    new SessionLineItemOptions ()
                     {
-                        //UnitAmount = eventDemo.Price, // Price is in USD cents.
-                        UnitAmountDecimal = eventDemo.Price * 100, // Price is in USD cents.
-                        Currency = "USD",
-                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        PriceData = new SessionLineItemPriceDataOptions
                         {
-                            Name = eventDemo.EventName,
-                            Description = eventDemo.EventDescription,
-                            //Images = new List<string> { eventDemio.ImageUrl }
+                            //UnitAmount = eventDemo.Price, // Price is in USD cents.
+                            UnitAmountDecimal = eventDemo.Price * 100, // Price is in USD cents.
+                            Currency = "USD",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = eventDemo.EventName,
+                                Description = eventDemo.EventDescription,
+                                //Images = new List<string> { eventDemio.ImageUrl }
+                            },
                         },
+                        Quantity = 1,
                     },
-                    Quantity = 1,
                 },
-            },
                 Mode = "payment", // One-time payment. Stripe supports recurring 'subscription' payments.
                 Metadata = new Dictionary<string, string>()
                 {
-                    ["EventID"] = eventDemo.ID.ToString(),
-                    ["UserID"] = usersService.GetCurrentUser().Id.ToString(),
+                    ["EventID"] = eventDemo.Id.ToString(),
+                    ["TenantID"] = tenantInfo.Id.ToString(),
+                },
+                PaymentIntentData = new SessionPaymentIntentDataOptions()
+                {
+                    TransferData = new SessionPaymentIntentDataTransferDataOptions()
+                    {
+                        Destination = tenantInfo.AccountId,
+                    },
+                    ApplicationFeeAmount = 0,
                 }
             };
-
+            var stripOp = Configurations.GetStripeConfig();
             var service = new SessionService();
-            var session = await service.CreateAsync(options);
+            //var session = await service.CreateAsync(options, requestOptions);
+            var session = await service.CreateAsync(options, 
+                new RequestOptions() { ApiKey= stripOp.ApiKey });
 
 
-            return session.Id;
+            return session;
         }
+
 
 
         // Automatic query parameter handling from ASP.NET.
         // Example URL: https://localhost:7051/checkout/success?sessionId=si_123123123123
-        public ActionResult CheckoutSuccess(string sessionId)
+        public ActionResult CheckoutSuccess(string sessionId, int tenantID)
         {
+            var tenantInfo = tenantInfoService.GetTenantInfo(tenantID);
+
+            //var requestOptions = new RequestOptions();
+            //requestOptions.ApiKey = tenantInfo.StripePaymentInfo.SecretKey;
+
+            
+
             var sessionService = new SessionService();
+            //var session = sessionService.Get(sessionId, requestOptions: requestOptions);
             var session = sessionService.Get(sessionId);
 
             // Here you can save order and customer details to your database.
             var total = session.AmountTotal.Value;
             var customerEmail = session.CustomerDetails.Email;
-            var userId = int.Parse(session.Metadata["UserID"]);
             var eventID = int.Parse(session.Metadata["EventID"]);
-            var user = usersService.GetUser(userId);
             var myEvent = eventService.GetEvent(eventID);
 
-            var userCheckoutModel = new UserInfoCheckoutModel()
+            var tenantCheckoutModel = new CheckoutModel()
             {
-                Email = user.Email,
+                //Email = tenantInfo.Email,
                 CheckoutEmail = customerEmail,
                 EventDescription = myEvent.EventDescription,
                 EventName = myEvent.EventName,
-                Id = userId,
+                Id = tenantID,
                 PaidAmount = total,
                 ReservedEventId = eventID,
-                Username = user.Username
+                TenantName = tenantInfo.TenantName
             };
 
 
-            return View(userCheckoutModel);
+            return View(tenantCheckoutModel);
 
         }
 

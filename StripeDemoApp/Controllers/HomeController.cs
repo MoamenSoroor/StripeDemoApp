@@ -1,4 +1,6 @@
-﻿using StripeDemoApp.Services;
+﻿using Stripe;
+using StripeDemoApp.Data;
+using StripeDemoApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,17 @@ namespace StripeDemoApp.Controllers
 {
     public class HomeController : Controller
     {
-        private EventService eventService = new EventService();
+        private readonly TenantService tenantInfoService;
+        private readonly AppEventsService eventService;
+        private readonly AppDataContext db;
+
+        public HomeController(TenantService tenantInfoService, AppEventsService eventService, AppDataContext db)
+        {
+            this.tenantInfoService = tenantInfoService;
+            this.eventService = eventService;
+            this.db = db;
+        }
+
         public ActionResult Index()
         {
             return View(eventService.GetEvents());
@@ -17,6 +29,11 @@ namespace StripeDemoApp.Controllers
 
         public ActionResult About()
         {
+
+
+            var options = new AccountCreateOptions { Type = "standard",  };
+            var service = new AccountService();
+            service.Create(options);
             ViewBag.Message = "Your application description page.";
 
             return View();

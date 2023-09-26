@@ -19,6 +19,12 @@ namespace StripeDemoApp
             return op;
         }
 
+        public static int GetCurrentTenantId()
+        {
+            string tenantId = ConfigurationManager.AppSettings["TenantId"]?.ToString();
+            return int.Parse(tenantId);
+        }
+
 
 
     }
