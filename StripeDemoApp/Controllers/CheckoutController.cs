@@ -9,6 +9,7 @@ using Stripe.Checkout;
 using StripeDemoApp.Services;
 using Stripe;
 using StripeDemoApp.Data;
+using StripeDemoApp.Exceptions;
 
 namespace StripeDemoApp.Controllers
 {
@@ -55,7 +56,7 @@ namespace StripeDemoApp.Controllers
 
         public async Task<ActionResult> CheckoutOrder(int eventId)
         {
-            var stripOp = Configurations.GetStripeConfig();
+            //var stripOp = Configurations.GetStripeConfig();
 
             var eventDemo = eventService.GetEvent(eventId);
 
@@ -89,6 +90,10 @@ namespace StripeDemoApp.Controllers
             //requestOptions.ApiKey = stripOp.ApiKey;
             //requestOptions.StripeAccount = tenantInfo.AccountId; // my account id
 
+            var tenantAccount = tenantInfo?.StripePaymentInfo?.AccountId;
+
+            if (tenantAccount == null)
+                throw new StripeAccountIdNullException();
 
             var options = new SessionCreateOptions
             {
@@ -128,7 +133,7 @@ namespace StripeDemoApp.Controllers
                 {
                     TransferData = new SessionPaymentIntentDataTransferDataOptions()
                     {
-                        Destination = tenantInfo.AccountId,
+                        Destination = tenantInfo.StripePaymentInfo.AccountId,
                     },
                     ApplicationFeeAmount = 0,
                 }

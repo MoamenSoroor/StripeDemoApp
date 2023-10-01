@@ -31,9 +31,11 @@ namespace StripeDemoApp.Controllers
         {
 
 
-            var options = new AccountCreateOptions { Type = "standard",  };
-            var service = new AccountService();
-            service.Create(options);
+            //var options = new AccountCreateOptions { Type = "standard",  };
+            //var service = new AccountService();
+            //service.Create(options);
+
+
             ViewBag.Message = "Your application description page.";
 
             return View();
@@ -42,6 +44,7 @@ namespace StripeDemoApp.Controllers
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
+            eventService.RegisterTestEvents();
 
             return View();
         }

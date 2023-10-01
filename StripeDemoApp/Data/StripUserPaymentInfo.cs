@@ -5,7 +5,7 @@ namespace StripeDemoApp.Data
 {
     public class StripUserPaymentInfo
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
         public int Id { get; set; }
         public string SecretKey { get; set; }

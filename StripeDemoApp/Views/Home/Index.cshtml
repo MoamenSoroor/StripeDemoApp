@@ -30,7 +30,7 @@
                             <td class="d-none d-md-table-cell">@item.Price.ToString("C")</td>
                             @if (item.HasPayment)
                             {
-                                <td><a href="/Checkout/CheckoutOrder?eventId=@item.Id" class="btn btn-primary">Pay Now</a></td>
+                                <td><a href="/SimpleCheckout/CheckoutOrder?eventId=@item.Id" class="btn btn-primary">Pay Now</a></td>
                                 @*<td><button onclick="OnSubscribe(@item.Id)" class="btn btn-primary">Pay Now</button></td>*@
                             }
                             else

@@ -1,0 +1,69 @@
+﻿@model IEnumerable<StripeDemoApp.Models.TenantInfoViewModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.TenantName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsRegisterationCompleted)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StripePaymentInfoId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StripePaymentSecretKey)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StripePaymentPublicKey)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StripePaymentAccountId)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.TenantName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsRegisterationCompleted)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StripePaymentInfoId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StripePaymentSecretKey)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StripePaymentPublicKey)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StripePaymentAccountId)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @*@Html.ActionLink("Delete", "Delete", new { id=item.Id })*@
+        </td>
+    </tr>
+}
+
+</table>

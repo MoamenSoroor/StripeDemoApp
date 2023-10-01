@@ -21,6 +21,8 @@ namespace StripeDemoApp.Services
                     EventDescription="a long College Event Description that will apears in the strip payment checkout page, \n you will enjoy",
                     HasPayment = true,
                     Price = 50.0M // amount in dollar  
+                    ,TenantId=1
+
                 },
                 new AppEvent
                 {
@@ -30,6 +32,7 @@ namespace StripeDemoApp.Services
                     EventDescription="a long Long Day Event Description that will apears in the strip payment checkout page, \n you will enjoy",
                     HasPayment = false,
                     Price = 0.0M // amount in dollar
+                    ,TenantId=1
                 },
                 new AppEvent
                 {
@@ -39,6 +42,7 @@ namespace StripeDemoApp.Services
                     EventDescription="a long Devops Event Description that will apears in the strip payment checkout page, \n you will enjoy",
                     HasPayment = true,
                     Price = 25.0M // amount in dollar
+                    ,TenantId=1
                 },
                 new AppEvent
                 {
@@ -48,6 +52,7 @@ namespace StripeDemoApp.Services
                     EventDescription="a long Architecture Big Event Description that will apears in the strip payment checkout page, \n you will enjoy",
                     HasPayment = false,
                     Price = 0.0M // amount in dollar
+                    ,TenantId=1
                 },
                 new AppEvent
                 {
@@ -57,6 +62,7 @@ namespace StripeDemoApp.Services
                     EventDescription="a long Dummy Event Description that will apears in the strip payment checkout page, \n you will enjoy",
                     HasPayment = true,
                     Price = 75.0M // amount in dollar
+                    ,TenantId=1
                 }
             };
         private readonly AppDataContext db;
@@ -87,7 +93,11 @@ namespace StripeDemoApp.Services
             return db.AppEvents.Include("TenantInfo").FirstOrDefault(v => v.Id == eventId);
         }
 
-
+        public void RegisterTestEvents()
+        {
+            db.AppEvents.AddRange(events);
+            db.SaveChanges();
+        }
     }
 
 

@@ -25,9 +25,9 @@ namespace StripeDemoApp
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            StripeOptions stripeOp = Configurations.GetStripeConfig();
-            // strip dynamic creating api key and secret key.
-            StripeConfiguration.ApiKey = stripeOp.ApiKey;
+            //StripeOptions stripeOp = Configurations.GetStripeConfig();
+            //// strip dynamic creating api key and secret key.
+            //StripeConfiguration.ApiKey = stripeOp.ApiKey;
 
 
             var builder = new ContainerBuilder();
